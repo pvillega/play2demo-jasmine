@@ -1,9 +1,18 @@
 AngularJS Test
 =====================================
 
-This is a test to try Angular Js using Play framework as the backend.
+This is a test to try Angular Js using Play framework as the backend. It's based on the TO DO app shown as tutorial for Angular Js.
 
-It's based on the TO DO app shown as tutorial for Angular Js.
+It integrates Jasmine via the [Sbt-Jasmine plugin](https://github.com/guardian/sbt-jasmine-plugin) so when you run *play test* it will run both Javascript and Play tests.
+Not that the tests added are too useful (just there to ensure it works).
+
+
+
+To improve
+=====================================
+- Integrate RequireJS to load the AngularJs controllers
+- Run Jasmine scenarios for AngularJs in the test. I have the feeling that due to the usage of Scala templates to render the app, this won't ever work and this test will have to be done via Play selenium tests. Not exactly the same but not so bad either.
+
 
 
 License (MIT License)
