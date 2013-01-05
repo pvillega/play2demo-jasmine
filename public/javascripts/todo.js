@@ -14,7 +14,7 @@
  * @param $scope model data injected into the controller
  * @constructor
  */
-function TodoCtrl($scope) {
+var TodoCtrl = function($scope) {
     //The data model, pure json, an array of tasks, referenced by the view on ng-repeat to iterate over it
     //or directly (todos.length) to retrieve some values about the array
     $scope.todos = [
