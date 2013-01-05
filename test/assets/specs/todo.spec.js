@@ -12,6 +12,11 @@
 
 describe('TodoCtrl controllers', function() {
 
+    var scope, ctrl, $httpBackend;
+
+    //We don't have a running Play server in here so we need to define a hardcoded route (unless I find a fix for this issue)
+    var tasksUrl = '/tasks/all';
+
     beforeEach(function(){
         this.addMatchers({
             toEqualData: function(expected) {
@@ -20,14 +25,20 @@ describe('TodoCtrl controllers', function() {
         });
     });
 
+    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+        $httpBackend = _$httpBackend_;
+        $httpBackend.expectGET(tasksUrl).
+            respond([{text: 'task1', done: true}, {text: 'task2', done: false}]);
+
+        scope = $rootScope.$new();
+        ctrl = $controller(TodoCtrl, {$scope: scope});
+    }));
+
     describe('TodoCtrl', function(){
-
-        it('should create "tasks" model with 2 tasks', function() {
-            var scope = {},
-                ctrl = new TodoCtrl(scope);
-
+        it('should create "tasks" model with 2 tasks fetched via xhr ', function() {
+            expect(scope.todos).toBeUndefined();
+            $httpBackend.flush();
             expect(scope.todos.length).toBe(2);
         });
     });
 });
-

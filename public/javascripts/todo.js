@@ -8,18 +8,28 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+// When running tests with Jasmine the jsRoutes object is not defined, which means we need to use a default route for the http call below
+// This kind of defeats the purpose of retrieving the routes via Play instead of hardcoding them, as we need a fallback for the tests
+// but I decided to leave the code just to see that we have the possibility, in case I find a way to improve this.
+var tasksUrl = '/tasks/all';
+if(!(typeof jsRoutes === "undefined")) {
+  tasksUrl = jsRoutes.controllers.Application.tasks().url ;
+}
+
 /**
  * This is the controller behind the view, as declared by ng-controller
  * All references to methods and data model in the view map to this controller
  * @param $scope model data injected into the controller
  * @constructor
  */
-var TodoCtrl = function($scope) {
-    //The data model, pure json, an array of tasks, referenced by the view on ng-repeat to iterate over it
-    //or directly (todos.length) to retrieve some values about the array
-    $scope.todos = [
-        {text:'learn angular', done:true},
-        {text:'build an angular app', done:false}];
+var TodoCtrl = ['$scope', '$http', function($scope, $http) {
+    //The data model is loaded via a GET request to the app, the url is obtained via the jsRoutes object added in main.scala.html
+    $http.get(tasksUrl).success(function(data) {
+        //The data model, pure json, an array of tasks, referenced by the view on ng-repeat to iterate over it
+        //or directly (todos.length) to retrieve some values about the array
+        console.log(data);
+        $scope.todos = data;
+    });
 
     //when submitting the form, this is called. Model in the form is referenced (todoText) and we add the task to
     //the data model
@@ -46,4 +56,4 @@ var TodoCtrl = function($scope) {
             if (!todo.done) $scope.todos.push(todo);
         });
     };
-}
+}]

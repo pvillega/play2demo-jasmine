@@ -10,6 +10,7 @@ Not that the tests added are too useful (just there to ensure it works).
 
 To improve
 =====================================
+- Make the app nice (a bit of css would be good)
 - Integrate RequireJS to load the AngularJs controllers
 - Run Jasmine scenarios for AngularJs in the test. I have the feeling that due to the usage of Scala templates to render the app, this won't ever work and this test will have to be done via Play selenium tests. Not exactly the same but not so bad either.
 

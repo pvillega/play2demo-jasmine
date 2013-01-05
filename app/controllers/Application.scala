@@ -12,11 +12,48 @@ package controllers
 
 import play.api._
 import play.api.mvc._
+import play.api.libs.json._
 
 object Application extends Controller {
   
-  def index = Action {
+  def index = Action { implicit request =>
     Ok(views.html.index())
+  }
+
+  /**
+   * Makes some routes available via javascript
+   */
+  def javascriptRoutes = Action { implicit request =>
+    Ok(
+      Routes.javascriptRouter("jsRoutes")(
+        routes.javascript.Application.tasks
+      )
+    ).as("text/javascript")
+  }
+
+  //Model for the Json response, this should be in database and more elaborated in a real app
+  case class Task(text: String, done: Boolean = false)
+
+  // to facilitate conversion from class to Json we create this implicit
+  implicit object dumpToJson extends Format[Task] {
+
+    def writes(o: Task): JsValue = JsObject(
+      List(
+        "text" -> JsString(o.text),
+        "done" -> JsBoolean(o.done)
+      )
+    )
+
+    def reads(json: JsValue): Task = Task(
+      text = (json \ "text").as[String],
+      done = (json \ "done").as[Boolean]
+    )
+  }
+
+  //returns a list of tasks as json
+  def tasks = Action { implicit request =>
+    val values = List(Task("learn angular", true), Task("build an Angular app"))
+    Ok(Json.toJson(values).toString()).as("application/json")
   }
   
 }

@@ -4,6 +4,10 @@
 
 # Home page
 GET     /                           controllers.Application.index
+GET     /tasks/all                  controllers.Application.tasks
+
+# Javascript routing
+GET     /assets/javascripts/routes          controllers.Application.javascriptRoutes
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

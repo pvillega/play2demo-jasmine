@@ -13,10 +13,19 @@
 
     <div ng-controller="TodoCtrl">
 
+
+
         <span>{{ remaining() }} of {{todos.length}} remaining</span> [ <a href="" ng-click="archive()">archive</a> ]
 
+        <br/>
+        Search: <input ng-model="query">
+
+
         <ul class="unstyled">
-            <li ng-repeat="todo in todos">
+            @* Only shown when a query is being applied *@
+            <div id="status" ng-show="query">Current filter: {{query}}</div>
+            @* Show models, filtered by query on client side *@
+            <li ng-repeat="todo in todos | filter:query">
                 <input type="checkbox" ng-model="todo.done">
                 <span class="done-{{todo.done}}">{{todo.text}}</span>
             </li>
