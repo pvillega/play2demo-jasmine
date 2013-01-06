@@ -42,6 +42,8 @@ describe('TodoCtrl controllers', function() {
             ctrl = $controller(TodoCtrl, {$scope: scope});
         }));
 
+
+
         it('should create "tasks" model with 2 tasks fetched via xhr ', function() {
             expect(scope.todos).toEqual([]); //notice that default state is not undefined, but empty!
             $httpBackend.flush();
