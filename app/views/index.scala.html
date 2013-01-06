@@ -6,37 +6,6 @@
 
 @main("Angular Js Test", moreScripts) {
 
-<div class="row">
-<div class="span8 offset2">
-
-    <h2>Todo</h2>
-
-    <div ng-controller="TodoCtrl">
-
-
-
-        <span>{{ remaining() }} of {{todos.length}} remaining</span> [ <a href="" ng-click="archive()">archive</a> ]
-
-        <br/>
-        Search: <input ng-model="query">
-
-
-        <ul class="unstyled">
-            @* Only shown when a query is being applied *@
-            <div id="status" ng-show="query">Current filter: {{query}}</div>
-            @* Show models, filtered by query on client side *@
-            <li ng-repeat="todo in todos | filter:query">
-                <input type="checkbox" ng-model="todo.done">
-                <span class="done-{{todo.done}}">{{todo.text}}</span>
-            </li>
-        </ul>
-
-        <form ng-submit="addTodo()">
-            <input type="text" ng-model="todoText" size="30" placeholder="add new todo here">
-            <input class="btn-primary" type="submit" value="add">
-        </form>
-
-    </div>
-</div>
+    <div ng-view></div>
     
 }

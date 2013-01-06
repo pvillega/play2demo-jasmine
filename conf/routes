@@ -4,7 +4,9 @@
 
 # Home page
 GET     /                           controllers.Application.index
+
 GET     /tasks/all                  controllers.Application.tasks
+POST    /tasks                      controllers.Application.addTask
 
 # Javascript routing
 GET     /assets/javascripts/routes          controllers.Application.javascriptRoutes

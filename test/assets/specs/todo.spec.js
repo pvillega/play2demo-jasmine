@@ -10,13 +10,13 @@
 
 'use strict';
 
+// Jasmine test, see http://pivotal.github.com/jasmine/for more information
 describe('TodoCtrl controllers', function() {
-
-    var scope, ctrl, $httpBackend;
 
     //We don't have a running Play server in here so we need to define a hardcoded route (unless I find a fix for this issue)
     var tasksUrl = '/tasks/all';
 
+    // Add matchers
     beforeEach(function(){
         this.addMatchers({
             toEqualData: function(expected) {
@@ -25,20 +25,30 @@ describe('TodoCtrl controllers', function() {
         });
     });
 
-    beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
-        $httpBackend = _$httpBackend_;
-        $httpBackend.expectGET(tasksUrl).
-            respond([{text: 'task1', done: true}, {text: 'task2', done: false}]);
+    // Import the definition of the services to the test, to be able to test the REST calls
+    beforeEach(module('todoServices'));
 
-        scope = $rootScope.$new();
-        ctrl = $controller(TodoCtrl, {$scope: scope});
-    }));
-
+    // Run test
     describe('TodoCtrl', function(){
+
+        var scope, ctrl, $httpBackend;
+
+        beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
+            $httpBackend = _$httpBackend_;
+            $httpBackend.expectGET(tasksUrl).
+                respond([{id: 1, text: 'task1', done: true}, {id: 2, text: 'task2', done: false}]);
+
+            scope = $rootScope.$new();
+            ctrl = $controller(TodoCtrl, {$scope: scope});
+        }));
+
         it('should create "tasks" model with 2 tasks fetched via xhr ', function() {
-            expect(scope.todos).toBeUndefined();
+            expect(scope.todos).toEqual([]); //notice that default state is not undefined, but empty!
             $httpBackend.flush();
             expect(scope.todos.length).toBe(2);
         });
     });
 });
+
+
+

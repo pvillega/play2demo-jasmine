@@ -20,9 +20,17 @@ object Application extends Controller {
     Ok(views.html.index())
   }
 
-  /**
-   * Makes some routes available via javascript
-   */
+  // Used to add new tasks, in the backend we simply show a message in the logs to notify that the call was successful
+  def addTask = Action(parse.json) { implicit request =>
+    (request.body \ "msg").asOpt[String].map { msg =>
+      Logger.info("Received task with text: %s".format(msg))
+      Ok
+    }.getOrElse {
+      BadRequest("Missing parameter [msg]")
+    }
+  }
+
+  // Makes some routes available via javascript
   def javascriptRoutes = Action { implicit request =>
     Ok(
       Routes.javascriptRouter("jsRoutes")(
@@ -32,19 +40,21 @@ object Application extends Controller {
   }
 
   //Model for the Json response, this should be in database and more elaborated in a real app
-  case class Task(text: String, done: Boolean = false)
+  case class Task(id: Int, text: String, done: Boolean = false)
 
   // to facilitate conversion from class to Json we create this implicit
   implicit object dumpToJson extends Format[Task] {
 
     def writes(o: Task): JsValue = JsObject(
       List(
+        "id" -> JsNumber(o.id),
         "text" -> JsString(o.text),
         "done" -> JsBoolean(o.done)
       )
     )
 
     def reads(json: JsValue): Task = Task(
+      id = (json \ "id").as[Int],
       text = (json \ "text").as[String],
       done = (json \ "done").as[Boolean]
     )
@@ -52,7 +62,7 @@ object Application extends Controller {
 
   //returns a list of tasks as json
   def tasks = Action { implicit request =>
-    val values = List(Task("learn angular", true), Task("build an Angular app"))
+    val values = List(Task(1, "learn angular", true), Task(2, "build an Angular app"))
     Ok(Json.toJson(values).toString()).as("application/json")
   }
   

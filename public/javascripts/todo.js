@@ -8,6 +8,26 @@
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+
+// Define a Module 'todoList' for Angular that will load the views. In this example the views are very simple, it's just to show
+// the concept
+angular.module('todoList', ['taskDoneFilter', 'todoServices']).
+    config(['$routeProvider', function($routeProvider) {
+        $routeProvider.
+            when('/all', {templateUrl: 'assets/angular/all.html',   controller: TodoCtrl}).
+            when('/task/:id', {templateUrl: 'assets/angular/task.html', controller: TaskDetailCtrl}).
+            otherwise({redirectTo: '/all'});
+    }]);
+
+
+// This filter allows us to convert strings. In this case, it adds an extra tick besides a task indicating if it's done or no
+angular.module('taskDoneFilter', []).filter('checkmark', function() {
+    return function(input) {
+        return input ? '\u2713' : '\u2718';
+    };
+});
+
+
 // When running tests with Jasmine the jsRoutes object is not defined, which means we need to use a default route for the http call below
 // This kind of defeats the purpose of retrieving the routes via Play instead of hardcoding them, as we need a fallback for the tests
 // but I decided to leave the code just to see that we have the possibility, in case I find a way to improve this.
@@ -16,25 +36,36 @@ if(!(typeof jsRoutes === "undefined")) {
   tasksUrl = jsRoutes.controllers.Application.tasks().url ;
 }
 
+// Definition of a Service, that stores all the REST requests independently from the controllers, facilitating change
+angular.module('todoServices', ['ngResource']).
+    factory('All', function ($resource) {
+        return $resource(tasksUrl, {}, {
+            //The data model is loaded via a GET request to the app
+            query: {method: 'GET', params: {}, isArray: true}
+        });
+    })
+    .factory('Task', function ($resource) {
+        return $resource('tasks', {}, {
+            add: {method: 'POST'}
+        });
+    });
+
 /**
  * This is the controller behind the view, as declared by ng-controller
  * All references to methods and data model in the view map to this controller
  * @param $scope model data injected into the controller
  * @constructor
  */
-var TodoCtrl = ['$scope', '$http', function($scope, $http) {
-    //The data model is loaded via a GET request to the app, the url is obtained via the jsRoutes object added in main.scala.html
-    $http.get(tasksUrl).success(function(data) {
-        //The data model, pure json, an array of tasks, referenced by the view on ng-repeat to iterate over it
-        //or directly (todos.length) to retrieve some values about the array
-        console.log(data);
-        $scope.todos = data;
-    });
+var TodoCtrl = ['$scope', 'All', 'Task', function($scope, All, Task) {
+    // We use the service to query for the data
+    $scope.todos = All.query();
 
     //when submitting the form, this is called. Model in the form is referenced (todoText) and we add the task to
     //the data model
     $scope.addTodo = function() {
-        $scope.todos.push({text:$scope.todoText, done:false});
+        var txt = $scope.todoText;
+        $scope.todos.push({text: txt, done: false});
+        Task.save({msg: txt});
         $scope.todoText = '';  //clear the input!
     };
 
@@ -56,4 +87,9 @@ var TodoCtrl = ['$scope', '$http', function($scope, $http) {
             if (!todo.done) $scope.todos.push(todo);
         });
     };
-}]
+}];
+
+// Task details controller, used in the routes to provide a second view for the application
+var TaskDetailCtrl = ['$scope', '$routeParams', function($scope, $routeParams) {
+    $scope.id = $routeParams.id;
+}];
