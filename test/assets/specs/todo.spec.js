@@ -27,22 +27,24 @@ describe('TodoCtrl controllers', function() {
 
     // Import the definition of the services to the test, to be able to test the REST calls
     beforeEach(module('todoServices'));
+    // Import the definition of the controllers
+    beforeEach(module('todoControllers'));
 
     // Run test
     describe('TodoCtrl', function(){
 
         var scope, ctrl, $httpBackend;
 
-        beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
-            $httpBackend = _$httpBackend_;
-            $httpBackend.expectGET(tasksUrl).
-                respond([{id: 1, text: 'task1', done: true}, {id: 2, text: 'task2', done: false}]);
+        beforeEach(
+            inject(function(_$httpBackend_, $rootScope, $controller) {
+                $httpBackend = _$httpBackend_;
+                $httpBackend.expectGET(tasksUrl).
+                    respond([{id: 1, text: 'task1', done: true}, {id: 2, text: 'task2', done: false}]);
 
-            scope = $rootScope.$new();
-            ctrl = $controller(TodoCtrl, {$scope: scope});
-        }));
-
-
+                scope = $rootScope.$new();
+                ctrl = $controller('TodoCtrl', {$scope: scope});
+            })
+        );
 
         it('should create "tasks" model with 2 tasks fetched via xhr ', function() {
             expect(scope.todos).toEqual([]); //notice that default state is not undefined, but empty!
