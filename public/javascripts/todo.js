@@ -1,4 +1,4 @@
-/*
+/* @license
  * Copyright (c) 2013 Pere Villega
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -11,12 +11,16 @@
 
 // Define a Module 'todoList' for Angular that will load the views. In this example the views are very simple, it's just to show
 // the concept
-angular.module('todoList', ['taskDoneFilter', 'todoServices']).
-    config(['$routeProvider', function($routeProvider) {
+angular.module('todoList', ['taskDoneFilter', 'todoControllers']).
+    config(['$routeProvider', '$locationProvider', function($routeProvider, $locationProvider) {
         $routeProvider.
-            when('/all', {templateUrl: 'assets/angular/all.html',   controller: TodoCtrl}).
-            when('/task/:id', {templateUrl: 'assets/angular/task.html', controller: TaskDetailCtrl}).
+            when('/all', {templateUrl: '/assets/angular/all.html',   controller: 'TodoCtrl'}).
+            when('/task/:id', {templateUrl: '/assets/angular/task.html', controller: 'TaskDetailCtrl'}).
             otherwise({redirectTo: '/all'});
+
+        // configure html5 to get links working
+        // If you don't do this, you URLs will be base.com/#/home rather than base.com/home
+        $locationProvider.html5Mode(true);
     }]);
 
 
@@ -38,17 +42,17 @@ if(!(typeof jsRoutes === "undefined")) {
 
 // Definition of a Service, that stores all the REST requests independently from the controllers, facilitating change
 angular.module('todoServices', ['ngResource']).
-    factory('All', function ($resource) {
+    factory('All', ['$resource', function ($resource) {
         return $resource(tasksUrl, {}, {
             //The data model is loaded via a GET request to the app
             query: {method: 'GET', params: {}, isArray: true}
         });
-    })
-    .factory('Task', function ($resource) {
+    }])
+    .factory('Task', ['$resource', function ($resource) {
         return $resource('tasks', {}, {
             add: {method: 'POST'}
         });
-    });
+    }]);
 
 /**
  * This is the controller behind the view, as declared by ng-controller
@@ -56,7 +60,7 @@ angular.module('todoServices', ['ngResource']).
  * @param $scope model data injected into the controller
  * @constructor
  */
-var TodoCtrl = ['$scope', 'All', 'Task', function($scope, All, Task) {
+angular.module('todoControllers', ['todoServices']).controller('TodoCtrl', ['$scope', 'All', 'Task', function($scope, All, Task) {
     // We use the service to query for the data
     $scope.todos = All.query();
 
@@ -87,9 +91,7 @@ var TodoCtrl = ['$scope', 'All', 'Task', function($scope, All, Task) {
             if (!todo.done) $scope.todos.push(todo);
         });
     };
-}];
-
-// Task details controller, used in the routes to provide a second view for the application
-var TaskDetailCtrl = ['$scope', '$routeParams', function($scope, $routeParams) {
+}]).controller('TaskDetailCtrl', ['$scope', '$routeParams', function($scope, $routeParams) {
     $scope.id = $routeParams.id;
-}];
+}]);
+

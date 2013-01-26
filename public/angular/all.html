@@ -19,7 +19,7 @@
                     <input type="checkbox" ng-model="todo.done">
                     <!-- We use a filter after the text as a sample on how to use filters for text conversion to provide ui enhancements -->
                     <span class="done-{{todo.done}}">{{todo.text}}</span> {{todo.done | checkmark}}
-                    [<a href="#/task/{{todo.id}}">Details</a>]
+                    [<a href="/task/{{todo.id}}">Details</a>]
                 </li>
             </ul>
 
