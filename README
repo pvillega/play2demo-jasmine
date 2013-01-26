@@ -8,10 +8,11 @@ Not that the tests added are too useful (just there to ensure it works).
 
 Angular templates are stored in the public folder, as they are managed by Angular itself. In this scenario Play acts as a simple backend, minimal UI defined via Scala templates. Good or bad, that depends on your taste :)
 
+The AngularJs source is minimized via the default Play minimizer, that's why the file is located under 'app/assets/javascript'. Be aware that this requires you using DI with array notation.
+
 Known Issues
 =====================================
 I couldn't manage to run the End to End tests via Jasmine, there are several issues that I couldn't solve. I believe the only way will be to use the Play Selenium test for that, using Selenium as described [in this blog](http://paulhammant.com/2012/04/09/testing-knockout-and-angular-with-selenium2/)
-
 
 
 To improve
